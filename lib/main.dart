@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:jobhub_web/login/login_screen.dart';
+import 'package:jobhub_web/mainpage/mainpage.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized;
@@ -74,7 +75,7 @@ class _myAppState extends State<myApp> {
             theme: ThemeData(
                 scaffoldBackgroundColor: Colors.white,
                 primarySwatch: Colors.blue),
-            home: const Login());
+            home: const MainPage());
       },
     );
   }
