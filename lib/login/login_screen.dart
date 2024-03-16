@@ -89,10 +89,10 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
           if (storedPassword == enteredPassword) {
             // Authentication successful
             // ignore: use_build_context_synchronously
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => const MainPage(),
+                builder: (context) =>  MainPage(),
               ),
             );
           } else {

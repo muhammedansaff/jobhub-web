@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:jobhub_web/login/login_screen.dart';
 import 'package:jobhub_web/mainpage/mainpage.dart';
+import 'package:jobhub_web/pages/UserRequests.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized;

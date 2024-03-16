@@ -2,25 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jobhub_web/widget/userView.dart';
 
-class UsersList extends StatelessWidget {
+class WorkersList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Users'),
+        title: const Text('Workers'),
       ),
-      body: const UsersListView(),
+      body: const WorkersListView(),
     );
   }
 }
 
-class UsersListView extends StatelessWidget {
-  const UsersListView({super.key});
+class WorkersListView extends StatelessWidget {
+  const WorkersListView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('workers')
+          .where('status', isEqualTo: true)
+          .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -32,7 +35,7 @@ class UsersListView extends StatelessWidget {
         }
 
         if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
-          return const Center(child: Text('No Jobs found'));
+          return const Center(child: Text('No new requests'));
         }
 
         // ignore: avoid_print
@@ -45,22 +48,24 @@ class UsersListView extends StatelessWidget {
             final userDoc = snapshot.data!.docs[index];
             final phone = userDoc['phoneNumber'];
             final emaill = userDoc['email'];
-
-            final location = userDoc['location'];
+            final profession = userDoc['profession'];
             final uid = userDoc['id'];
-
+            final idimg = userDoc['myId'];
             final name = userDoc['name'];
             final userImage = userDoc['userImage'];
-
+            final pass = userDoc['password'];
             return Padding(
                 padding: const EdgeInsets.symmetric(
                     vertical: 4), // Add vertical spacing here
                 child: UserView(
+                    pass: pass,
+                    check: false,
+                    img: idimg,
                     phoneNumber: phone,
                     email: emaill,
                     uid: uid,
+                    prof: profession,
                     userName: name,
-                    location: location,
                     userImage: userImage));
           },
         );

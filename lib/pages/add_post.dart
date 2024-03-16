@@ -37,10 +37,23 @@ class _AddPostsState extends State<AddPosts> {
         String pid = const Uuid().v4();
         var snapshot = await fs.ref('post').child('$pid.jpg').putBlob(file);
         String downloadUrl = await snapshot.ref.getDownloadURL();
+        // Get the current timestamp
+        Timestamp now = Timestamp.now();
+
+// Convert the Timestamp to a DateTime
+        DateTime nowDateTime = now.toDate();
+
+// Calculate the deadline time as one week from the current timestamp
+        DateTime deadlineDateTime = nowDateTime.add(Duration(days: 7));
+
+// Convert the DateTime back to a Timestamp
+        Timestamp deadline = Timestamp.fromDate(deadlineDateTime);
+
         FirebaseFirestore.instance.collection('posts').doc(pid).set({
           'postid': pid,
           'posturl': downloadUrl,
-          'postedtime': Timestamp.now()
+          'postedtime': Timestamp.now(),
+          'dadlinetime': deadline
         });
 
         setState(() {
