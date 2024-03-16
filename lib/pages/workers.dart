@@ -35,7 +35,7 @@ class WorkersListView extends StatelessWidget {
         }
 
         if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
-          return const Center(child: Text('No new requests'));
+          return const Center(child: Text('No workers found'));
         }
 
         // ignore: avoid_print
