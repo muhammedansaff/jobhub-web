@@ -92,7 +92,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) =>  MainPage(),
+                builder: (context) => MainPage(),
               ),
             );
           } else {

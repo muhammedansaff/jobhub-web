@@ -1,9 +1,12 @@
+import 'dart:html';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jobhub_web/Services/global_methods.dart';
+import 'package:jobhub_web/pages/download.dart';
 
 class UserView extends StatefulWidget {
   final String userName;
@@ -15,8 +18,13 @@ class UserView extends StatefulWidget {
   final String img;
   final bool check;
   final String pass;
+  final Timestamp createdAt;
+
+  final bool isWorker;
   const UserView(
       {super.key,
+      required this.isWorker,
+      required this.createdAt,
       required this.pass,
       required this.check,
       required this.img,
@@ -95,53 +103,71 @@ class _UserViewState extends State<UserView> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(widget.userName),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Email: ${widget.email}'),
-              Text('Phone Number: ${widget.phoneNumber}'),
-              Text('profession: ${widget.prof}'),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 50,
-                    child: IconButton(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('Image'),
-                                content: SizedBox(
-                                  width: MediaQuery.of(context).size.width *
-                                      0.5, // Adjust the width as needed
-                                  height: MediaQuery.of(context).size.height *
-                                      0.5, // Adjust the height as needed
-                                  child: Image.network(widget.img.toString()),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context)
-                                          .pop(); // Close the dialog
-                                    },
-                                    child: const Text('Close'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Email: ${widget.email}'),
+                Text('Phone Number: ${widget.phoneNumber}'),
+                Text('Profession: ${widget.prof}'),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Image'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.5, // Adjust the width as needed
+                                    height: MediaQuery.of(context).size.height *
+                                        0.5, // Adjust the height as needed
+                                    child: Image.network(widget.img.toString()),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      ImageDownloadWidget(
+                                        imageUrl: widget.userImage,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.of(context)
+                                              .pop(); // Close the dialog
+                                        },
+                                        child: const Text('Close'),
+                                      ),
+                                    ],
                                   ),
                                 ],
-                              );
-                            },
-                          );
-                        },
-                        icon: const Icon(Icons.image)),
-                  ),
-                  Text("${widget.userName}'s ID")
-                ],
-              )
-            ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.image),
+                          const SizedBox(width: 5),
+                          Text("${widget.userName}'s ID"),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -156,26 +182,57 @@ class _UserViewState extends State<UserView> {
     );
   }
 
-  void _updateStatus() async {
+  void _updateStatus(bool newStatus) async {
     try {
-      // Create user in Firebase Authentication
-      await _auth.createUserWithEmailAndPassword(
-          email: widget.email.trim().toLowerCase(),
-          password: widget.pass.trim());
-
-      // Update the status field for the document with the specified ID
+      // Update the status in the workers collection
       await FirebaseFirestore.instance
           .collection('workers')
-          .doc(widget.email)
-          .update({'status': true});
+          .doc(widget.uid) // Assuming uid is the unique identifier for the user
+          .update({'status': newStatus});
 
-      Fluttertoast.showToast(
-        msg: 'Status updated successfully',
-        toastLength: Toast.LENGTH_LONG,
-        backgroundColor: Colors.grey,
-        fontSize: 18,
-        gravity: ToastGravity.CENTER,
-      );
+      if (newStatus) {
+        await _auth.createUserWithEmailAndPassword(
+            email: widget.email.trim().toLowerCase(),
+            password: widget.pass.trim());
+        final User? user = _auth.currentUser;
+        final uid = user!.uid;
+
+        // Create a new document in the acceptedworkers collection
+        await FirebaseFirestore.instance
+            .collection('acceptedworkers')
+            .doc(uid)
+            .set({
+          'id': uid,
+          'email': widget.email,
+          'name': widget.userName,
+          'createdAt': widget.createdAt,
+          'imageUrl': widget.userImage,
+          'isWorker': widget.isWorker,
+          'myId': widget.img,
+          'phoneNumber': widget.phoneNumber,
+          'profession': widget.prof,
+          'status': true,
+          'password': widget.pass
+        });
+        FirebaseFirestore.instance.collection('workeranduser').doc(uid).set(
+          {
+            'phoneNumber': widget.phoneNumber,
+            'id': uid,
+            'name': widget.userName,
+            'email': widget.email,
+            'isWorker': true,
+            'userImage': widget.userImage
+          },
+        );
+
+        Fluttertoast.showToast(
+          msg: 'Status updated successfully and user signed in',
+          toastLength: Toast.LENGTH_LONG,
+          backgroundColor: Colors.grey,
+          fontSize: 18,
+          gravity: ToastGravity.CENTER,
+        );
+      }
     } catch (error) {
       GlobalMethod.showErrorDialog(
         error: 'Failed to update status: $error',
@@ -186,17 +243,14 @@ class _UserViewState extends State<UserView> {
 
   void _deleteUser() async {
     try {
+      final FirebaseAuth _auth = FirebaseAuth.instance;
+
       // Delete user from Firebase Authentication
-      await _auth.signInWithEmailAndPassword(
-          email: widget.email.trim().toLowerCase(),
-          password: widget.pass.trim());
-      var user = _auth.currentUser;
-      await user!.delete();
 
       // Delete the user document from Firestore
       await FirebaseFirestore.instance
           .collection('workers')
-          .doc(widget.email)
+          .doc(widget.uid)
           .delete();
 
       Fluttertoast.showToast(
@@ -292,7 +346,7 @@ class _UserViewState extends State<UserView> {
                                 color: Colors.green,
                               ),
                               onPressed: () {
-                                _updateStatus();
+                                _updateStatus(true);
                               },
                             ),
                           ),

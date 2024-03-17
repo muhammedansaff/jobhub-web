@@ -48,18 +48,20 @@ class UserRequestsView extends StatelessWidget {
             final userDoc = snapshot.data!.docs[index];
             final phone = userDoc['phoneNumber'];
             final emaill = userDoc['email'];
-
+            final createdAt = userDoc['createAt'];
             final uid = userDoc['id'];
             final name = userDoc['name'];
             final profession = userDoc['profession'];
             final userImage = userDoc['userImage'];
             final idimg = userDoc['myId'];
             final pass = userDoc['password'];
-
+            final isworker = userDoc['isWorker'];
             return Padding(
                 padding: const EdgeInsets.symmetric(
                     vertical: 4), // Add vertical spacing here
                 child: UserView(
+                    isWorker: isworker,
+                    createdAt: createdAt,
                     pass: pass,
                     check: true,
                     img: idimg,

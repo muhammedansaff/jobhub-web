@@ -20,10 +20,8 @@ class WorkersListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('workers')
-          .where('status', isEqualTo: true)
-          .snapshots(),
+      stream:
+          FirebaseFirestore.instance.collection('acceptedworkers').snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -48,24 +46,28 @@ class WorkersListView extends StatelessWidget {
             final userDoc = snapshot.data!.docs[index];
             final phone = userDoc['phoneNumber'];
             final emaill = userDoc['email'];
-            final profession = userDoc['profession'];
+            final createdAt = userDoc['createdAt'];
             final uid = userDoc['id'];
-            final idimg = userDoc['myId'];
             final name = userDoc['name'];
-            final userImage = userDoc['userImage'];
+            final profession = userDoc['profession'];
+            final userImage = userDoc['imageUrl'];
+            final idimg = userDoc['myId'];
             final pass = userDoc['password'];
+            final isworker = userDoc['isWorker'];
             return Padding(
                 padding: const EdgeInsets.symmetric(
                     vertical: 4), // Add vertical spacing here
                 child: UserView(
+                    isWorker: isworker,
+                    createdAt: createdAt,
                     pass: pass,
                     check: false,
                     img: idimg,
                     phoneNumber: phone,
                     email: emaill,
                     uid: uid,
-                    prof: profession,
                     userName: name,
+                    prof: profession,
                     userImage: userImage));
           },
         );

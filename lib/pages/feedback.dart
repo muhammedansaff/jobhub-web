@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ComplaintsList extends StatelessWidget {
-  const ComplaintsList({super.key});
+class feedbackList extends StatelessWidget {
+  const feedbackList({super.key});
 
   @override
   Widget build(BuildContext context) {
