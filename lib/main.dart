@@ -76,7 +76,7 @@ class _myAppState extends State<myApp> {
             theme: ThemeData(
                 scaffoldBackgroundColor: Colors.white,
                 primarySwatch: Colors.blue),
-            home: const MainPage());
+            home: const Login());
       },
     );
   }

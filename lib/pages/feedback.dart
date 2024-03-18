@@ -39,7 +39,7 @@ class FeedbacksList extends StatelessWidget {
           itemCount: snapshot.data!.docs.length,
           itemBuilder: (context, index) {
             var feedback = snapshot.data!.docs[index];
-            var userName = feedback['userName'];
+
             var userFeedback = feedback['feedback'];
 
             return Padding(
@@ -51,10 +51,9 @@ class FeedbacksList extends StatelessWidget {
                 ),
                 child: ListTile(
                   title: Text(
-                    userName,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    userFeedback,
                   ),
-                  subtitle: Text(userFeedback),
+
                   leading: const CircleAvatar(
                     child: Icon(Icons.person),
                   ),

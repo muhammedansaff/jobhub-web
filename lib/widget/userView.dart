@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -7,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jobhub_web/Services/global_methods.dart';
 import 'package:jobhub_web/pages/download.dart';
+
+import 'package:url_launcher/url_launcher.dart';
 
 class UserView extends StatefulWidget {
   final String userName;
@@ -182,6 +182,8 @@ class _UserViewState extends State<UserView> {
     );
   }
 
+// Replace this with your implementation to securely store and retrieve the password
+
   void _updateStatus(bool newStatus) async {
     try {
       // Update the status in the workers collection
@@ -214,6 +216,7 @@ class _UserViewState extends State<UserView> {
           'status': true,
           'password': widget.pass
         });
+
         FirebaseFirestore.instance.collection('workeranduser').doc(uid).set(
           {
             'phoneNumber': widget.phoneNumber,
